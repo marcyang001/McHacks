@@ -21,101 +21,10 @@
 <link rel="stylesheet" href="stylesheets/reveal.css" />
 <link rel="stylesheet" href="stylesheets/owl.carousel.css">
 <link rel="stylesheet" href="stylesheets/owl.theme.css">
+<link rel="stylesheet" href="stylesheets/app.css">
 <script src="javascripts/jquery.min.js"></script>
 <script src="javascripts/foundation.min.js"></script>
 <script src="javascripts/owl.carousel.min.js"></script>
-<style>
-#owl-demo .item img {
-	display: block;
-	width: 100%;
-	height: auto;
-}
-
-.image-wrapper {
-	width: 100%;
-	height: auto;
-	border: 1px solid rgba(0, 0, 0, 0.04);
-	overflow: hidden;
-	position: relative;
-	text-align: center;
-	border-radius: 4px;
-}
-
-.image-overlay-content {
-	width: 100%;
-	height: 100%;
-	position: absolute;
-	overflow: hidden;
-	top: 0;
-	left: 0;
-}
-
-.overlay-fade-in p {
-	letter-spacing: 0.15em;
-	color: #f4f4f4;
-	font-size: 28px;
-	opacity: 0;
-	transition: all 0.2s linear;
-}
-
-.overlay-fade-in img {
-	transition: all 0.2s linear;
-}
-
-.overlay-fade-in .image-overlay-content {
-	opacity: 0;
-	background-color: rgba(0, 0, 0, 0.4);
-	transition: all 0.4s ease-in-out;
-}
-
-.overlay-fade-in h2 {
-	color: #f2f2f2;
-	font-size: 1.8rem;
-	margin-top: 40%;
-	opacity: 0;
-	transition: all 0.2s ease-in-out;
-	background: rgba(0, 0, 0, 0.7);
-}
-
-.overlay-fade-in .button {
-	display: inline-block;
-	text-decoration: none;
-	padding: 7px 14px;
-	background: #FFF;
-	color: #222;
-	text-transform: uppercase;
-	box-shadow: 0 0 1px #000;
-	position: relative;
-	border: 1px solid #999;
-	opacity: 0;
-	transition: all 0.2s ease-in-out;
-}
-
-.overlay-fade-in .button:hover {
-	box-shadow: 0 0 5px #000;
-}
-
-.overlay-fade-in:hover img {
-	transform: scale(1.2);
-}
-
-.overlay-fade-in:hover .image-overlay-content {
-	opacity: 1;
-}
-
-.overlay-fade-in:hover h2, .overlay-fade-in p, .overlay-fade-in .button
-	{
-	opacity: 1;
-}
-
-.overlay-fade-in:hover p {
-	transition-delay: 0.1s;
-}
-
-.overlay-fade-in:hover .button {
-	transition-delay: 0.2s;
-}
-</style>
 </head>
 <div class="title-bar" data-responsive-toggle="realEstateMenu"
 	data-hide-for="small">
@@ -157,28 +66,24 @@
 </div>
 <br>
 <div class="row">
-	<div class="medium-7 large-6 columns">
+	<div class="medium-7 large-9 columns">
 		<h1>Want to transfer your lease?</h1>
 		<p class="subheader">If you are going away after study and the
 			lease will still be valid for some time? No worries anymore! Post
 			your lease here for people to take yours!</p>
 		<button class="button">Post your lease now!</button>
 	</div>
-	<div class="show-for-large large-3 columns">
-		<img src="http://placehold.it/400x370&text=PSR1257 + 12 C"
-			alt="picture of space">
-	</div>
 	<div class="medium-5 large-3 columns">
 		<div class="callout secondary">
 			<form>
 				<div class="row">
 					<div class="small-12 columns">
-						<label>Coming for study? <input type="text"
-							placeholder="Search your school">
+						<label>Minimum price? <input type="text"
+							placeholder="Enter in CAD">
 						</label>
 					</div>
 					<div class="small-12 columns">
-						<label>Maximum budget? <input type="text"
+						<label>Maximum price? <input type="text"
 							placeholder="Enter in CAD">
 						</label>
 						<button type="submit" class="button">Search Now!</button>
@@ -192,13 +97,12 @@
 	<hr>
 </div>
 <div class="row column">
-	<p class="lead">Trending Planetary Destinations</p>
+	<p class="lead">Listings</p>
 </div>
 <div class="row small-up-1 medium-up-2 large-up-3">
 	<div class="column">
 		<div class="callout">
-			<p>Title</p>
-			<p>
+			<p>Title with size</p>
 			<div class="listing">
 				<div id="owl-demo" class="owl-carousel owl-theme">
 					<div class="item">
@@ -207,8 +111,6 @@
 								alt="image of a planet called Pegasi B">
 							<div class="image-overlay-content">
 								<h2>maybe just say what this room is</h2>
-								<p class="price">$99.99</p>
-								<a href="#" class="button">more photo</a>
 							</div>
 						</div>
 					</div>
@@ -218,8 +120,6 @@
 								alt="image of a planet called Pegasi B">
 							<div class="image-overlay-content">
 								<h2>.overlay-fade-in</h2>
-								<p class="price">$99.99</p>
-								<a href="#" class="button">more photo</a>
 							</div>
 						</div>
 					</div>
@@ -229,14 +129,11 @@
 								alt="image of a planet called Pegasi B">
 							<div class="image-overlay-content">
 								<h2>.overlay-fade-in</h2>
-								<p class="price">$99.99</p>
-								<a href="#" class="button">more photo</a>
 							</div>
 						</div>
 					</div>
 				</div>
 			</div>
-			</p>
 			<p class="lead">Price</p>
 			<p class="subheader">Address, and author and its contact</p>
 		</div>
@@ -332,7 +229,7 @@
 </footer>
 <script type="text/javascript">
 	$(document).ready(function() {
-		$("#owl-demo").owlCarousel({
+		$(".owl-carousel").owlCarousel({
 
 			navigation : true, // Show next and prev buttons
 			slideSpeed : 300,
