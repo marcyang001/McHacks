@@ -46,7 +46,7 @@ public class Upload extends HttpServlet {
     // this is the key for the whole entity --> Leasing
     // dont touch these two lines
     String content = req.getParameter("addressH");
-    String pricing = req.getParameter("priceH");
+    double pricing = Double.parseDouble(req.getParameter("priceH"));
     String contact = req.getParameter("contactH");
     String startPeriod = req.getParameter("startPeriodH");
     String title = req.getParameter("titleH");

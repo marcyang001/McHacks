@@ -7,6 +7,11 @@
 <%@ page import="com.google.appengine.api.datastore.Key"%>
 <%@ page import="com.google.appengine.api.datastore.KeyFactory"%>
 <%@ page import="com.google.appengine.api.datastore.Query"%>
+<%@ page import="com.google.appengine.api.datastore.Query.Filter"%>
+<%@ page import="com.google.appengine.api.datastore.Query.FilterPredicate"%>
+<%@ page import="com.google.appengine.api.datastore.Query.FilterOperator"%>
+<%@ page import="com.google.appengine.api.datastore.Query.CompositeFilter"%>
+<%@ page import="com.google.appengine.api.datastore.Query.CompositeFilterOperator"%>
 <%@ page import="com.google.appengine.api.users.User"%>
 <%@ page import="com.google.appengine.api.users.UserService"%>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory"%>
@@ -95,15 +100,15 @@
 			<form>
 				<div class="row">
 					<div class="small-12 columns">
-						<label>Minimum price? <input type="text"
+						<label>Minimum price? <input type="text" id="minPrice"
 							placeholder="Enter in CAD">
 						</label>
 					</div>
 					<div class="small-12 columns">
-						<label>Maximum price? <input type="text"
+						<label>Maximum price? <input type="text" id="maxPrice"
 							placeholder="Enter in CAD">
 						</label>
-						<button type="submit" class="button">Search Now!</button>
+						<button class="button" onclick="return search();">Search Now!</button>
 					</div>
 				</div>
 			</form>
@@ -118,14 +123,41 @@
 </div>
 <div class="row small-up-1 medium-up-2 large-up-3">
 	<%
-	int maxFetch = 6;
-	  DatastoreService datastore =
-      DatastoreServiceFactory.getDatastoreService();
-  // Run an ancestor query to ensure we see the most up-to-date
+	  int maxFetch = 6;
+		double maxPrice = 100000000.0;
+		double minPrice = 0.0;
+		if (request.getParameter("maxPrice") != null) {
+	  if (!request.getParameter("maxPrice").isEmpty()) {
+		      maxPrice = Double.parseDouble(request.getParameter("maxPrice"));
+	  }
+	    }
+		if (request.getParameter("minPrice") != null) {
+	  if (!request.getParameter("minPrice").isEmpty()) {
+		      minPrice = Double.parseDouble(request.getParameter("minPrice"));
+	  }
+	    }
+		  DatastoreService datastore =
+	  DatastoreServiceFactory.getDatastoreService();
+		  Filter heightMinFilter =
+		      new FilterPredicate("pricingJ",
+		                          FilterOperator.GREATER_THAN_OR_EQUAL,
+		                          minPrice);
+
+		    Filter heightMaxFilter =
+		      new FilterPredicate("pricingJ",
+		                          FilterOperator.LESS_THAN_OR_EQUAL,
+		                          maxPrice);
+
+		    //Use CompositeFilter to combine multiple filters
+		    Filter heightRangeFilter =
+		      CompositeFilterOperator.and(heightMinFilter, heightMaxFilter);
+
+	  // Run an ancestor query to ensure we see the most up-to-date
 	  // view of the Greetings belonging to the selected Guestbook.
 	  Query query =
-	      new Query("Listing").addSort("date",
-	          Query.SortDirection.DESCENDING);
+	      new Query("Listing").setFilter(heightRangeFilter)
+	          .addSort("pricingJ", Query.SortDirection.ASCENDING)
+	          .addSort("date", Query.SortDirection.DESCENDING);
 	  List<Entity> listings =
 	      datastore.prepare(query).asList(FetchOptions.Builder.withLimit(500));
 	  if (listings.isEmpty()) {
@@ -135,26 +167,24 @@
 	  } else {
 	    if (request.getParameter("maxFetch") != null) {
 	      if (!request.getParameter("maxFetch").isEmpty()) {
-		      maxFetch = Integer.parseInt(request.getParameter("maxFetch"));
+	        maxFetch = Integer.parseInt(request.getParameter("maxFetch"));
 	      }
 	    }
 	    if (maxFetch < 6) {
 	      maxFetch = 6;
 	    }
 	    for (int i = maxFetch - 6; i < maxFetch && i < listings.size(); i++) {
-		  	  Entity listing = listings.get(i);
-		      pageContext.setAttribute("home_addressH",
+	      Entity listing = listings.get(i);
+	      pageContext.setAttribute("home_addressH",
 	          listing.getProperty("HomeAddressJ"));
-		      pageContext.setAttribute("lease_price",
-		          listing.getProperty("pricingJ"));
-		      pageContext.setAttribute("contact_info",
-		          listing.getProperty("contactJ"));
-		      pageContext.setAttribute("start_period",
-		          listing.getProperty("startPeriodJ"));
-		      pageContext
-		          .setAttribute("title_info", listing.getProperty("titleJ"));
-			  pageContext.setAttribute("listing_user",
-		            listing.getProperty("user"));
+	      pageContext.setAttribute("lease_price",
+	          listing.getProperty("pricingJ"));
+	      pageContext.setAttribute("contact_info",
+	          listing.getProperty("contactJ"));
+	      pageContext.setAttribute("start_period",
+	          listing.getProperty("startPeriodJ"));
+	      pageContext.setAttribute("title_info", listing.getProperty("titleJ"));
+	      pageContext.setAttribute("listing_user", listing.getProperty("user"));
 	%>
 	<div class="column">
 		<div class="callout">
@@ -192,11 +222,13 @@
 </div>
 <div class="row column">
 	<%
+    pageContext.setAttribute("maxPrice", Double.toString(maxPrice));
+    pageContext.setAttribute("minPrice", Double.toString(minPrice));
 	  if (maxFetch > 6) {
 	    int previous = maxFetch - 6;
 	    pageContext.setAttribute("prv", Integer.toString(previous));
 	%>
-	<a class="button hollow expanded" href="/?maxFetch=${fn:escapeXml(prv)}">Previous page</a>
+	<a class="button hollow expanded" href="/?maxFetch=${fn:escapeXml(prv)}&maxPrice=${fn:escapeXml(maxPrice)}&minPrice=${fn:escapeXml(minPrice)}">Previous page</a>
 	<%
 	  }
 	%>
@@ -205,7 +237,7 @@
 	    int next = maxFetch + 6;
 	    pageContext.setAttribute("next", Integer.toString(next));
 	%>
-	<a class="button hollow expanded" href="/?maxFetch=${fn:escapeXml(next)}">Next page</a>
+	<a class="button hollow expanded" href="/?maxFetch=${fn:escapeXml(next)}&maxPrice=${fn:escapeXml(maxPrice)}&minPrice=${fn:escapeXml(minPrice)}">Next page</a>
 	<%
 	  }
 	%>
@@ -236,6 +268,12 @@
 	</div>
 </footer>
 <script type="text/javascript">
+function search() {
+	console.log("here");
+	console.log(document.getElementById("minPrice").value);
+	window.location.href="/?minPrice="+document.getElementById("minPrice").value+"&maxPrice="+document.getElementById("maxPrice").value;
+	return false;
+}
 	$(document).ready(function() {
 		$(".owl-carousel").owlCarousel({
 
