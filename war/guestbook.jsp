@@ -71,7 +71,7 @@
 				method="post" enctype="multipart/form-data">
 				<div class="row column log-in-form">
 					<div>
-						<label>Description<BR> <input name="titleH" size="20"
+						<label>Description<BR> <input name="titleH" size="60"
 							placeholder="ex)size, characteristics" required></label>
 					</div>
 					<div>
@@ -91,7 +91,7 @@
 						<label>Address</label>
 					</div>
 					<div>
-						<textarea name="addressH" rows="3" cols="60" required></textarea>
+						<textarea name="addressH" rows="3" cols="60" placeholder="ex)1111 STREET, CITY, PROVINCE, COUNTRY" required></textarea>
 					</div>
 					<label>Press ctrl to select multiple files</label> <input
 						type="file" name="myFile" multiple /> <input class="button" type="submit"
