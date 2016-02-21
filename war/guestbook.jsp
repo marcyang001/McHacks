@@ -63,6 +63,7 @@
             pageContext.setAttribute("lease_price", greeting.getProperty("pricingJ"));
             pageContext.setAttribute("contact_info", greeting.getProperty("contactJ"));
             pageContext.setAttribute("start_period", greeting.getProperty("startPeriodJ"));
+            pageContext.setAttribute("title_info", greeting.getProperty("titleJ"));
             if (greeting.getProperty("user") == null) {
                 %>
                 <p>An anonymous person wrote:</p>
@@ -75,7 +76,9 @@
                 <%
                     }
                 %>
+                
                 <!--
+                    <blockquote>${fn:escapeXml(title_info)}</blockquote>
                     <blockquote>${fn:escapeXml(home_addressH)}</blockquote>
                     <blockquote>${fn:escapeXml(lease_price)}</blockquote>
                     <blockquote>${fn:escapeXml(contact_info)}</blockquote>
@@ -88,14 +91,18 @@
 
 <form action="/sign" method="post">
     
+    <div><label>Title<BR>
+        <input name="titleH" size="20"></label></div>  
     <div><label>Contact<BR>
-        <input name="contactH" size="20"></label></div>    
+        <input name="contactH" size="20"></label></div>
+
     
     <div><label>Start Period of Lease <BR> 
         <input name="startPeriodH" size="20"></label></div>
     
     <div><label>Price per Month<BR> 
         <input name="priceH" size="20"></label></div>
+
 
     <div><label>Address</label><BR>
     <div><textarea name="addressH" rows="3" cols="60"></textarea></div>

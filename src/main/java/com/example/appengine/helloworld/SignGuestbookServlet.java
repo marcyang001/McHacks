@@ -70,7 +70,7 @@ public class SignGuestbookServlet extends HttpServlet {
     String pricing = req.getParameter("priceH");
     String contact = req.getParameter("contactH");
     String startPeriod = req.getParameter("startPeriodH");
-    
+    String title = req.getParameter("titleH");
     
     Date date = new Date();
     //these data will be stored in the data storage
@@ -82,6 +82,7 @@ public class SignGuestbookServlet extends HttpServlet {
     leasing.setProperty("pricingJ", pricing);
     leasing.setProperty("contactJ", contact);
     leasing.setProperty("startPeriodJ", startPeriod);
+    leasing.setProperty("titleJ", title);
     
     
     
@@ -90,18 +91,5 @@ public class SignGuestbookServlet extends HttpServlet {
 
     resp.sendRedirect("/guestbook.jsp?guestbookName=" + guestbookName);
     
-    
-    //when the user post this thread
-    //lease.setProperty("date", date);
-    
-    
-    
-    
-    
-    
-    
-    
-    //DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    //datastore.put(lease);
   }
 }
