@@ -27,7 +27,9 @@
 <div class="title-bar" data-responsive-toggle="realEstateMenu"
 	data-hide-for="small">
 	<button class="menu-icon" type="button" data-toggle></button>
-	<div class="title-bar-title">Menu</div>
+	<div class="title-bar-title">
+		<a href="/">Home</a>
+	</div>
 </div>
 <div class="top-bar" id="realEstateMenu">
 	<div class="top-bar-left">
