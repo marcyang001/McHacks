@@ -118,6 +118,7 @@
 </div>
 <div class="row small-up-1 medium-up-2 large-up-3">
 	<%
+	int maxFetch = 6;
 	  DatastoreService datastore =
       DatastoreServiceFactory.getDatastoreService();
   // Run an ancestor query to ensure we see the most up-to-date
@@ -126,13 +127,22 @@
 	      new Query("Listing").addSort("date",
 	          Query.SortDirection.DESCENDING);
 	  List<Entity> listings =
-	      datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5));
+	      datastore.prepare(query).asList(FetchOptions.Builder.withLimit(500));
 	  if (listings.isEmpty()) {
 	%>
 	<p>No Listings..</p>
 	<%
 	  } else {
-		  for (Entity listing : listings) {
+	    if (request.getParameter("maxFetch") != null) {
+	      if (!request.getParameter("maxFetch").isEmpty()) {
+		      maxFetch = Integer.parseInt(request.getParameter("maxFetch"));
+	      }
+	    }
+	    if (maxFetch < 6) {
+	      maxFetch = 6;
+	    }
+	    for (int i = maxFetch - 6; i < maxFetch && i < listings.size(); i++) {
+		  	  Entity listing = listings.get(i);
 		      pageContext.setAttribute("home_addressH",
 	          listing.getProperty("HomeAddressJ"));
 		      pageContext.setAttribute("lease_price",
@@ -181,7 +191,24 @@
 	%>
 </div>
 <div class="row column">
-	<a class="button hollow expanded">Load More</a>
+	<%
+	  if (maxFetch > 6) {
+	    int previous = maxFetch - 6;
+	    pageContext.setAttribute("prv", Integer.toString(previous));
+	%>
+	<a class="button hollow expanded" href="/?maxFetch=${fn:escapeXml(prv)}">Previous page</a>
+	<%
+	  }
+	%>
+	<%
+	  if (maxFetch < listings.size()) {
+	    int next = maxFetch + 6;
+	    pageContext.setAttribute("next", Integer.toString(next));
+	%>
+	<a class="button hollow expanded" href="/?maxFetch=${fn:escapeXml(next)}">Next page</a>
+	<%
+	  }
+	%>
 </div>
 <footer>
 	<div class="row expanded callout secondary">
