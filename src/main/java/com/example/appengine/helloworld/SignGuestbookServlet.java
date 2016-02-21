@@ -1,3 +1,18 @@
+/**
+ * Copyright 2012 Google Inc. All Rights Reserved. 
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.example.appengine.helloworld;
 
 import com.google.appengine.api.datastore.DatastoreService;
@@ -23,19 +38,70 @@ public class SignGuestbookServlet extends HttpServlet {
       throws IOException {
     UserService userService = UserServiceFactory.getUserService();
     User user = userService.getCurrentUser();
-
-    String guestbookName = req.getParameter("guestbookName");
-    Key guestbookKey = KeyFactory.createKey("Guestbook", guestbookName);
-    String content = req.getParameter("content");
+    
+    /*
+    String sublet = "sublet";
+    
+    String ownerName = req.getParameter("owner_name");
+    String address = req.getParameter("address");
+    String availTime = req.getParameter("time"); //the period when the lease is available to sublet
+    String price = req.getParameter("price");
+    //user the key Sublet to get all the leases available
+    Key leaseKey = KeyFactory.createKey("Sublet", sublet);
+    
     Date date = new Date();
-    Entity greeting = new Entity("Greeting", guestbookKey);
-    greeting.setProperty("user", user);
-    greeting.setProperty("date", date);
-    greeting.setProperty("content", content);
-
+    Entity lease = new Entity("Lease", leaseKey);
+      
+    lease.setProperty("user", user);
+    lease.setProperty("owner", ownerName);
+    lease.setProperty("available_date", availTime);
+    lease.setProperty("address", address);
+    lease.setProperty("price", price);
+    
+    */
+  //this is the key for the whole entity --> Leasing
+    String guestbookName = req.getParameter("leaseNameH");
+    Key guestbookKey = KeyFactory.createKey("Guestbook", guestbookName);
+    //dont touch these two lines
+    
+    
+    
+    String content = req.getParameter("addressH");
+    String pricing = req.getParameter("priceH");
+    String contact = req.getParameter("contactH");
+    String startPeriod = req.getParameter("startPeriodH");
+    
+    
+    Date date = new Date();
+    //these data will be stored in the data storage
+    Entity leasing = new Entity("Listing", guestbookKey);
+    
+    leasing.setProperty("user", user);
+    leasing.setProperty("date", date);
+    leasing.setProperty("HomeAddressJ", content);
+    leasing.setProperty("pricingJ", pricing);
+    leasing.setProperty("contactJ", contact);
+    leasing.setProperty("startPeriodJ", startPeriod);
+    
+    
+    
     DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    datastore.put(greeting);
+    datastore.put(leasing);
 
     resp.sendRedirect("/guestbook.jsp?guestbookName=" + guestbookName);
+    
+    
+    //when the user post this thread
+    //lease.setProperty("date", date);
+    
+    
+    
+    
+    
+    
+    
+    
+    //DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+    //datastore.put(lease);
   }
 }

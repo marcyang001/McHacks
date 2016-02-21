@@ -71,7 +71,7 @@
 		<p class="subheader">If you are going away after study and the
 			lease will still be valid for some time? No worries anymore! Post
 			your lease here for people to take yours!</p>
-		<button class="button">Post your lease now!</button>
+		<button class="button" onclick="window.location='guestbook.jsp';">Post your lease now!</button>
 	</div>
 	<div class="medium-5 large-3 columns">
 		<div class="callout secondary">
@@ -200,7 +200,7 @@
 	</div>
 </div>
 <div class="row column">
-	<a class="button hollow expanded">Load More</a>
+	<a class="button hollow expanded">Load More</a>	
 </div>
 <footer>
 	<div class="row expanded callout secondary">

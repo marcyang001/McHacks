@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.google.appengine.api.datastore.DatastoreService" %>
 <%@ page import="com.google.appengine.api.datastore.DatastoreServiceFactory" %>
@@ -20,11 +21,11 @@
 <body>
 
 <%
-    String guestbookName = request.getParameter("guestbookName");
+    String guestbookName = request.getParameter("leaseNameH");
     if (guestbookName == null) {
         guestbookName = "default";
     }
-    pageContext.setAttribute("guestbookName", guestbookName);
+    pageContext.setAttribute("leaseNameH", guestbookName);
     UserService userService = UserServiceFactory.getUserService();
     User user = userService.getCurrentUser();
     if (user != null) {
@@ -47,7 +48,7 @@
     Key guestbookKey = KeyFactory.createKey("Guestbook", guestbookName);
     // Run an ancestor query to ensure we see the most up-to-date
     // view of the Greetings belonging to the selected Guestbook.
-    Query query = new Query("Greeting", guestbookKey).addSort("date", Query.SortDirection.DESCENDING);
+    Query query = new Query("Listing", guestbookKey).addSort("date", Query.SortDirection.DESCENDING);
     List<Entity> greetings = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5));
     if (greetings.isEmpty()) {
 %>
@@ -57,37 +58,56 @@
 %>
 <p>Messages in Guestbook '${fn:escapeXml(guestbookName)}'.</p>
 <%
-    for (Entity greeting : greetings) {
-        pageContext.setAttribute("greeting_content",
-                greeting.getProperty("content"));
-        if (greeting.getProperty("user") == null) {
-%>
-<p>An anonymous person wrote:</p>
-<%
-} else {
-    pageContext.setAttribute("greeting_user",
-            greeting.getProperty("user"));
-%>
-<p><b>${fn:escapeXml(greeting_user.nickname)}</b> wrote:</p>
-<%
-    }
-%>
-<blockquote>${fn:escapeXml(greeting_content)}</blockquote>
-<%
+        for (Entity greeting : greetings) {
+            pageContext.setAttribute("home_addressH", greeting.getProperty("HomeAddressJ"));
+            pageContext.setAttribute("lease_price", greeting.getProperty("pricingJ"));
+            pageContext.setAttribute("contact_info", greeting.getProperty("contactJ"));
+            pageContext.setAttribute("start_period", greeting.getProperty("startPeriodJ"));
+            if (greeting.getProperty("user") == null) {
+                %>
+                <p>An anonymous person wrote:</p>
+                <%
+                } 
+                else {
+                    pageContext.setAttribute("greeting_user", greeting.getProperty("user"));
+                %>
+                <p><b>${fn:escapeXml(greeting_user.nickname)}</b> wrote:</p>
+                <%
+                    }
+                %>
+                <!--
+                    <blockquote>${fn:escapeXml(home_addressH)}</blockquote>
+                    <blockquote>${fn:escapeXml(lease_price)}</blockquote>
+                    <blockquote>${fn:escapeXml(contact_info)}</blockquote>
+                    <blockquote>${fn:escapeXml(start_period)}</blockquote>
+                -->
+                <%
         }
     }
 %>
 
 <form action="/sign" method="post">
-    <div><textarea name="content" rows="3" cols="60"></textarea></div>
+    
+    <div><label>Contact<BR>
+        <input name="contactH" size="20"></label></div>    
+    
+    <div><label>Start Period of Lease <BR> 
+        <input name="startPeriodH" size="20"></label></div>
+    
+    <div><label>Price per Month<BR> 
+        <input name="priceH" size="20"></label></div>
+
+    <div><label>Address</label><BR>
+    <div><textarea name="addressH" rows="3" cols="60"></textarea></div>
     <div><input type="submit" value="Post Greeting"/></div>
-    <input type="hidden" name="guestbookName" value="${fn:escapeXml(guestbookName)}"/>
+    <input type="hidden" name="leaseNameH" value="${fn:escapeXml(leaseNameH)}"/>
 </form>
 
+<!--
 <form action="/guestbook.jsp" method="get">
     <div><input type="text" name="guestbookName" value="${fn:escapeXml(guestbookName)}"/></div>
     <div><input type="submit" value="Switch Guestbook"/></div>
 </form>
-
+-->
 </body>
 </html>
