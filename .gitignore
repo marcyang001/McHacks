@@ -7,3 +7,5 @@
 target/
 
 *.zip
+
+war/WEB-INF/app*

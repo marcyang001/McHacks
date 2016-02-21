@@ -11,6 +11,24 @@
 		<servlet-name>sign</servlet-name>
 		<servlet-class>com.example.appengine.helloworld.SignGuestbookServlet</servlet-class>
 	</servlet>
+	<servlet>
+		<servlet-name>Upload</servlet-name>
+		<servlet-class>com.example.appengine.helloworld.Upload</servlet-class>
+	</servlet>
+
+	<servlet>
+		<servlet-name>Serve</servlet-name>
+		<servlet-class>com.example.appengine.helloworld.Serve</servlet-class>
+	</servlet>
+
+	<servlet-mapping>
+		<servlet-name>Upload</servlet-name>
+		<url-pattern>/upload</url-pattern>
+	</servlet-mapping>
+	<servlet-mapping>
+		<servlet-name>Serve</servlet-name>
+		<url-pattern>/serve</url-pattern>
+	</servlet-mapping>
 	<servlet-mapping>
 		<servlet-name>hello</servlet-name>
 		<url-pattern>/hello</url-pattern>

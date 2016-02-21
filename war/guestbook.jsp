@@ -1,120 +1,96 @@
 
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="com.google.appengine.api.datastore.DatastoreService" %>
-<%@ page import="com.google.appengine.api.datastore.DatastoreServiceFactory" %>
-<%@ page import="com.google.appengine.api.datastore.Entity" %>
-<%@ page import="com.google.appengine.api.datastore.FetchOptions" %>
-<%@ page import="com.google.appengine.api.datastore.Key" %>
-<%@ page import="com.google.appengine.api.datastore.KeyFactory" %>
-<%@ page import="com.google.appengine.api.datastore.Query" %>
-<%@ page import="com.google.appengine.api.users.User" %>
-<%@ page import="com.google.appengine.api.users.UserService" %>
-<%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
-<%@ page import="java.util.List" %>
-<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ page contentType="text/html;charset=UTF-8" language="java"%>
+<%@ page import="com.google.appengine.api.datastore.DatastoreService"%>
+<%@ page
+	import="com.google.appengine.api.datastore.DatastoreServiceFactory"%>
+<%@ page import="com.google.appengine.api.datastore.Entity"%>
+<%@ page import="com.google.appengine.api.datastore.FetchOptions"%>
+<%@ page import="com.google.appengine.api.datastore.Key"%>
+<%@ page import="com.google.appengine.api.datastore.KeyFactory"%>
+<%@ page import="com.google.appengine.api.datastore.Query"%>
+<%@ page import="com.google.appengine.api.users.User"%>
+<%@ page import="com.google.appengine.api.users.UserService"%>
+<%@ page import="com.google.appengine.api.users.UserServiceFactory"%>
+<%@ page
+	import="com.google.appengine.api.blobstore.BlobstoreServiceFactory"%>
+<%@ page import="com.google.appengine.api.blobstore.BlobstoreService"%>
+<%@ page import="java.util.List"%>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <html>
 <head>
-    <link type="text/css" rel="stylesheet" href="/stylesheets/main.css"/>
-</head>
+<link rel="stylesheet" href="stylesheets/foundation.min.css" />
+<link rel="stylesheet" href="stylesheets/app.css">
+<script src="javascripts/jquery.min.js"></script>
+<script src="javascripts/foundation.min.js"></script>
 
 <body>
+<div class="title-bar" data-responsive-toggle="realEstateMenu"
+	data-hide-for="small">
+	<button class="menu-icon" type="button" data-toggle></button>
+	<div class="title-bar-title">Menu</div>
+</div>
+<div class="top-bar" id="realEstateMenu">
+	<div class="top-bar-left">
+		<ul class="menu" data-responsive-menu="accordion">
+			<li class="menu-text">Post your lease and get away from it!</li>
+		</ul>
+	</div>
+	<div class="top-bar-right">
+		<ul class="menu">
+			<%
+			  UserService userService = UserServiceFactory.getUserService();
+						User user = userService.getCurrentUser();
+						if (user != null) {
+							pageContext.setAttribute("user", user);
+			%>
+			<p>
+				${fn:escapeXml(user.nickname)} <a class="button"
+					href="<%=userService.createLogoutURL(request.getRequestURI())%>">sign
+					out</a>
+			</p>
+			<%
+			  } else {
+			%>
+			<p>
+				<a class="button"
+					href="<%=userService.createLoginURL(request.getRequestURI())%>">Sign
+					in</a>
+			</p>
+			<%
+			  }
+			%>
+		</ul>
+	</div>
+</div>
+<br>
+	<form
+		action="<%=BlobstoreServiceFactory.getBlobstoreService().createUploadUrl(
+          "/upload")%>"
+		method="post" enctype="multipart/form-data">
+		<div>
+			<label>Description<BR> <input name="titleH" size="20" placeholder="ex)size, characteristics"></label>
+		</div>
+		<div>
+			<label>Phone Number<BR> <input name="contactH" size="20"></label>
+		</div>
+		<div>
+			<label>Start Period of Lease <BR> <input
+				name="startPeriodH" size="20" placeholder="yy/mm/dd or yyyy/mm"></label>
+		</div>
 
-<%
-    String guestbookName = request.getParameter("leaseNameH");
-    if (guestbookName == null) {
-        guestbookName = "default";
-    }
-    pageContext.setAttribute("leaseNameH", guestbookName);
-    UserService userService = UserServiceFactory.getUserService();
-    User user = userService.getCurrentUser();
-    if (user != null) {
-        pageContext.setAttribute("user", user);
-%>
-<p>Hello, ${fn:escapeXml(user.nickname)}! (You can
-    <a href="<%= userService.createLogoutURL(request.getRequestURI()) %>">sign out</a>.)</p>
-<%
-} else {
-%>
-<p>Hello!
-    <a href="<%= userService.createLoginURL(request.getRequestURI()) %>">Sign in</a>
-    to include your name with greetings you post.</p>
-<%
-    }
-%>
-
-<%
-    DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-    Key guestbookKey = KeyFactory.createKey("Guestbook", guestbookName);
-    // Run an ancestor query to ensure we see the most up-to-date
-    // view of the Greetings belonging to the selected Guestbook.
-    Query query = new Query("Listing", guestbookKey).addSort("date", Query.SortDirection.DESCENDING);
-    List<Entity> greetings = datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5));
-    if (greetings.isEmpty()) {
-%>
-<p>Guestbook '${fn:escapeXml(guestbookName)}' has no messages.</p>
-<%
-} else {
-%>
-<p>Messages in Guestbook '${fn:escapeXml(guestbookName)}'.</p>
-<%
-        for (Entity greeting : greetings) {
-            pageContext.setAttribute("home_addressH", greeting.getProperty("HomeAddressJ"));
-            pageContext.setAttribute("lease_price", greeting.getProperty("pricingJ"));
-            pageContext.setAttribute("contact_info", greeting.getProperty("contactJ"));
-            pageContext.setAttribute("start_period", greeting.getProperty("startPeriodJ"));
-            pageContext.setAttribute("title_info", greeting.getProperty("titleJ"));
-            if (greeting.getProperty("user") == null) {
-                %>
-                <p>An anonymous person wrote:</p>
-                <%
-                } 
-                else {
-                    pageContext.setAttribute("greeting_user", greeting.getProperty("user"));
-                %>
-                <p><b>${fn:escapeXml(greeting_user.nickname)}</b> wrote:</p>
-                <%
-                    }
-                %>
-                
-                <!--
-                    <blockquote>${fn:escapeXml(title_info)}</blockquote>
-                    <blockquote>${fn:escapeXml(home_addressH)}</blockquote>
-                    <blockquote>${fn:escapeXml(lease_price)}</blockquote>
-                    <blockquote>${fn:escapeXml(contact_info)}</blockquote>
-                    <blockquote>${fn:escapeXml(start_period)}</blockquote>
-                -->
-                <%
-        }
-    }
-%>
-
-<form action="/sign" method="post">
-    
-    <div><label>Title<BR>
-        <input name="titleH" size="20"></label></div>  
-    <div><label>Contact<BR>
-        <input name="contactH" size="20"></label></div>
-
-    
-    <div><label>Start Period of Lease <BR> 
-        <input name="startPeriodH" size="20"></label></div>
-    
-    <div><label>Price per Month<BR> 
-        <input name="priceH" size="20"></label></div>
-
-
-    <div><label>Address</label><BR>
-    <div><textarea name="addressH" rows="3" cols="60"></textarea></div>
-    <div><input type="submit" value="Post Greeting"/></div>
-    <input type="hidden" name="leaseNameH" value="${fn:escapeXml(leaseNameH)}"/>
-</form>
-
-<!--
-<form action="/guestbook.jsp" method="get">
-    <div><input type="text" name="guestbookName" value="${fn:escapeXml(guestbookName)}"/></div>
-    <div><input type="submit" value="Switch Guestbook"/></div>
-</form>
--->
+		<div>
+			<label>Price per Month<BR> <input name="priceH"
+				size="20" placeholder="in CAD"></label>
+		</div>
+		<div>
+			<label>Address</label><BR>
+		</div>
+		<div>
+			<textarea name="addressH" rows="3" cols="60"></textarea>
+		</div>
+		<input type="file" name="myFile" multiple /> <input type="submit"
+			value="Submit">
+	</form>
 </body>
 </html>

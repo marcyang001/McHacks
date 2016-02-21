@@ -10,15 +10,13 @@
 <%@ page import="com.google.appengine.api.users.User"%>
 <%@ page import="com.google.appengine.api.users.UserService"%>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory"%>
+<%@ page import="com.example.appengine.helloworld.Upload"%>
 <%@ page import="java.util.List"%>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 
 <html>
 <head>
 <link rel="stylesheet" href="stylesheets/foundation.min.css" />
-<link rel="stylesheet" href="stylesheets/slick.css" />
-<link rel="stylesheet" href="stylesheets/slick-theme.css" />
-<link rel="stylesheet" href="stylesheets/reveal.css" />
 <link rel="stylesheet" href="stylesheets/owl.carousel.css">
 <link rel="stylesheet" href="stylesheets/owl.theme.css">
 <link rel="stylesheet" href="stylesheets/app.css">
@@ -41,9 +39,9 @@
 		<ul class="menu">
 			<%
 			  UserService userService = UserServiceFactory.getUserService();
-						User user = userService.getCurrentUser();
-						if (user != null) {
-							pageContext.setAttribute("user", user);
+			User user = userService.getCurrentUser();
+				if (user != null) {
+				pageContext.setAttribute("user", user);
 			%>
 			<p>
 				${fn:escapeXml(user.nickname)} <a class="button"
@@ -71,7 +69,8 @@
 		<p class="subheader">If you are going away after study and the
 			lease will still be valid for some time? No worries anymore! Post
 			your lease here for people to take yours!</p>
-		<button class="button" onclick="window.location='guestbook.jsp';">Post your lease now!</button>
+		<button class="button" onclick="window.location='guestbook.jsp';">Post
+			your lease now!</button>
 	</div>
 	<div class="medium-5 large-3 columns">
 		<div class="callout secondary">
@@ -100,107 +99,71 @@
 	<p class="lead">Listings</p>
 </div>
 <div class="row small-up-1 medium-up-2 large-up-3">
+	<%
+	  DatastoreService datastore =
+      DatastoreServiceFactory.getDatastoreService();
+  // Run an ancestor query to ensure we see the most up-to-date
+	  // view of the Greetings belonging to the selected Guestbook.
+	  Query query =
+	      new Query("Listing").addSort("date",
+	          Query.SortDirection.DESCENDING);
+	  List<Entity> listings =
+	      datastore.prepare(query).asList(FetchOptions.Builder.withLimit(5));
+	  if (listings.isEmpty()) {
+	%>
+	<p>No Listings..</p>
+	<%
+	  } else {
+		  for (Entity listing : listings) {
+		      pageContext.setAttribute("home_addressH",
+	          listing.getProperty("HomeAddressJ"));
+		      pageContext.setAttribute("lease_price",
+		          listing.getProperty("pricingJ"));
+		      pageContext.setAttribute("contact_info",
+		          listing.getProperty("contactJ"));
+		      pageContext.setAttribute("start_period",
+		          listing.getProperty("startPeriodJ"));
+		      pageContext
+		          .setAttribute("title_info", listing.getProperty("titleJ"));
+			  pageContext.setAttribute("listing_user",
+		            listing.getProperty("user"));
+	%>
 	<div class="column">
 		<div class="callout">
-			<p>Title with size</p>
+			<p>${fn:escapeXml(title_info)}</p>
 			<div class="listing">
 				<div id="owl-demo" class="owl-carousel owl-theme">
+					<%
+					  List<String> images = Upload.getImages(listing);
+					  for(String image : images){
+					    pageContext.setAttribute("image", image);
+					%>
 					<div class="item">
 						<div class="image-wrapper overlay-fade-in">
-							<img src="http://placehold.it/400x370&text=Pegasi A"
-								alt="image of a planet called Pegasi B">
+							<img src=${fn:escapeXml(image)} width="400" height="370">
 							<div class="image-overlay-content">
-								<h2>maybe just say what this room is</h2>
+								<h2>${listing_user.email}</h2>
 							</div>
 						</div>
 					</div>
-					<div class="item">
-						<div class="image-wrapper overlay-fade-in">
-							<img src="http://placehold.it/400x370&text=Pegasi B"
-								alt="image of a planet called Pegasi B">
-							<div class="image-overlay-content">
-								<h2>.overlay-fade-in</h2>
-							</div>
-						</div>
-					</div>
-					<div class="item">
-						<div class="image-wrapper overlay-fade-in">
-							<img src="http://placehold.it/400x370&text=Pegasi C"
-								alt="image of a planet called Pegasi B">
-							<div class="image-overlay-content">
-								<h2>.overlay-fade-in</h2>
-							</div>
-						</div>
-					</div>
+					<%
+					  }
+					%>
 				</div>
 			</div>
-			<p class="lead">Price</p>
-			<p class="subheader">Address, and author and its contact</p>
+			<p class="lead">\$${fn:escapeXml(lease_price)}</p>
+			<p class="subheader">${fn:escapeXml(home_addressH)}</p>
+			<p>Phone: ${fn:escapeXml(contact_info)}</p>
+			<p>Available from: ${fn:escapeXml(start_period)}</p>
 		</div>
 	</div>
-	<div class="column">
-		<div class="callout">
-			<p>Pegasi B</p>
-			<p>
-				<img src="http://placehold.it/400x370&text=Pegasi B"
-					alt="image of a planet called Pegasi B">
-			</p>
-			<p class="lead">Copernican Revolution caused an uproar</p>
-			<p class="subheader">Find Earth-like planets life outside the
-				Solar System</p>
-		</div>
-	</div>
-	<div class="column">
-		<div class="callout">
-			<p>Pegasi B</p>
-			<p>
-				<img src="http://placehold.it/400x370&text=Pegasi B"
-					alt="image of a planet called Pegasi B">
-			</p>
-			<p class="lead">Copernican Revolution caused an uproar</p>
-			<p class="subheader">Find Earth-like planets life outside the
-				Solar System</p>
-		</div>
-	</div>
-	<div class="column">
-		<div class="callout">
-			<p>Pegasi B</p>
-			<p>
-				<img src="http://placehold.it/400x370&text=Pegasi B"
-					alt="image of a planet called Pegasi B">
-			</p>
-			<p class="lead">Copernican Revolution caused an uproar</p>
-			<p class="subheader">Find Earth-like planets life outside the
-				Solar System</p>
-		</div>
-	</div>
-	<div class="column">
-		<div class="callout">
-			<p>Pegasi B</p>
-			<p>
-				<img src="http://placehold.it/400x370&text=Pegasi B"
-					alt="image of a planet called Pegasi B">
-			</p>
-			<p class="lead">Copernican Revolution caused an uproar</p>
-			<p class="subheader">Find Earth-like planets life outside the
-				Solar System</p>
-		</div>
-	</div>
-	<div class="column">
-		<div class="callout">
-			<p>Pegasi B</p>
-			<p>
-				<img src="http://placehold.it/400x370&text=Pegasi B"
-					alt="image of a planet called Pegasi B">
-			</p>
-			<p class="lead">Copernican Revolution caused an uproar</p>
-			<p class="subheader">Find Earth-like planets life outside the
-				Solar System</p>
-		</div>
-	</div>
+	<%
+	  }
+		  }
+	%>
 </div>
 <div class="row column">
-	<a class="button hollow expanded">Load More</a>	
+	<a class="button hollow expanded">Load More</a>
 </div>
 <footer>
 	<div class="row expanded callout secondary">
