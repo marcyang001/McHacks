@@ -180,7 +180,7 @@
 				</div>
 			</div>
 			<p class="lead">\$${fn:escapeXml(lease_price)}</p>
-			<p class="subheader">${fn:escapeXml(home_addressH)}</p>
+			<p class="subheader"><a target="_blank" href="http://maps.google.com/?q=${fn:escapeXml(home_addressH)}">${fn:escapeXml(home_addressH)}</a></p>
 			<p>Phone: ${fn:escapeXml(contact_info)}</p>
 			<p>Available from: ${fn:escapeXml(start_period)}</p>
 		</div>
